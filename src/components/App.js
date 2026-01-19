@@ -1,42 +1,52 @@
-import React, { Component, useState } from "react";
+import React, { useState, useEffect } from "react";
 import '../styles/App.css';
 
-class App extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            renderBall: false,
-            posi : 0,
-            ballPosition: { left: "0px" }
-        };
-        this.renderChoice = this.renderBallOrButton.bind(this)
-        this.buttonClickHandler = this.buttonClickHandler.bind(this)
+const App = () => {
+    // 1. Initialize state using hooks
+    const [renderBall, setRenderBall] = useState(false);
+    const [posi, setPosi] = useState(0);
+    const [ballPosition, setBallPosition] = useState({ left: "0px" });
+
+    // 2. Button Handler
+    const buttonClickHandler = () => {
+        setRenderBall(true);
     };
 
-    buttonClickHandler() {
-   
-   }
-    renderBallOrButton() {
-		if (this.state.renderBall) {
-		    return <div className="ball" style={this.state.ballPosition}></div>
-		} else {
-		    return <button onClick={this.buttonClickHandler} >Start</button>
-		}
-    }
+    // 3. Handle Key Press
+    // We wrap this logic in useEffect to attach the listener to the document
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            // Check for Right Arrow (39) AND ensure the ball is rendered
+            if (event.keyCode === 39 && renderBall) {
+                const newPos = posi + 5;
+                setPosi(newPos);
+                setBallPosition({ left: newPos + "px" });
+            }
+        };
 
-    // bind ArrowRight keydown event
-    componentDidMount() {
-      
-    }
+        // Attach event listener
+        document.addEventListener("keydown", handleKeyDown);
 
-    render() {
-        return (
-            <div className="playground">
-                {this.renderBallOrButton()}
-            </div>
-        )
-    }
-}
+        // Cleanup function (similar to componentWillUnmount)
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [renderBall, posi]); // Re-run effect if these change so logic isn't stale
 
+    // 4. Render Logic
+    const renderBallOrButton = () => {
+        if (renderBall) {
+            return <div className="ball" style={ballPosition}></div>;
+        } else {
+            return <button onClick={buttonClickHandler}>Start</button>;
+        }
+    };
+
+    return (
+        <div className="playground">
+            {renderBallOrButton()}
+        </div>
+    );
+};
 
 export default App;
