@@ -38,7 +38,7 @@ const App = () => {
         if (renderBall) {
             return <div className="ball" style={ballPosition}></div>;
         } else {
-            return <button onClick={buttonClickHandler}>Start</button>;
+            return <button className="start" onClick={buttonClickHandler}>Start</button>;
         }
     };
 
